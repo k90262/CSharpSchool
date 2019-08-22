@@ -59,25 +59,50 @@ namespace School
         {
             switch (e.Key)
             {
-                // TODO: Exercise 1: Task 1a: If the user pressed Enter, edit the details for the currently selected student
-                case Key.Enter: Student student = this.studentsList.SelectedItem as Student;
-                    // TODO: Exercise 1: Task 2a: Use the StudentsForm to display and edit the details of the student
+                // If the user pressed Enter, edit the details for the currently selected student
+                case Key.Enter:
+                    Student student = this.studentsList.SelectedItem as Student;
+                    // Use the StudentsForm to display and edit the details of the student
                     StudentForm sf = new StudentForm();
-                    // TODO: Exercise 1: Task 2b: Set the title of the form and populate the fields on the form with the details of the student
+                    // Set the title of the form and populate the fields on the form with the details of the student
                     sf.Title = "Edit Student Details";
                     sf.firstName.Text = student.FirstName;
                     sf.lastName.Text = student.LastName;
                     sf.dateOfBirth.Text = student.DateOfBirth.ToString("MM/dd/yyyy");
-                    // TODO: Exercise 1: Task 3a: Display the form
+                    // Display the form
                     if (sf.ShowDialog().Value)
                     {
-                        // TODO: Exercise 1: Task 3b: When the user closes the form, copy the details back to the student
+                        // When the user closes the form, copy the details back to the student
                         student.FirstName = sf.firstName.Text;
                         student.LastName = sf.lastName.Text;
                         student.DateOfBirth = DateTime.ParseExact(sf.dateOfBirth.Text, "MM/dd/yyyy", CultureInfo.InvariantCulture);
-                        // TODO: Exercise 1: Task 3c: Enable saving (changes are not made permanent until they are written back to the database)
+                        // Enable saving (changes are not made permanent until they are written back to the database)
                         saveChanges.IsEnabled = true;
                     }
+                    break;
+
+                // Exercise 2: Task 1a: If the user pressed Insert, add a new student
+                case Key.Insert:
+                    // Exercise 2: Task 2a: Use the StudentsForm to get the details of the student from the user
+                    sf = new StudentForm();
+                    // Exercise 2: Task 2b: Set the title of the form to indicate which class the student will be added to (the class for the currently selected teacher)
+                    sf.Title = "New Student for Class " + teacher.Class;
+                    // Exercise 2: Task 3a: Display the form and get the details of the new student
+                    if (sf.ShowDialog().Value)
+                    {
+                        // Exercise 2: Task 3b: When the user closes the form, retrieve the details of the student from the form and use them to create a new Student object
+                        Student newStudent = new Student();
+                        newStudent.FirstName = sf.firstName.Text;
+                        newStudent.LastName = sf.lastName.Text;
+                        newStudent.DateOfBirth = DateTime.ParseExact(sf.dateOfBirth.Text, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                        // Exercise 2: Task 4a: Assign the new student to the current teacher
+                        this.teacher.Students.Add(newStudent);
+                        // Exercise 2: Task 4b: Add the student to the list displayed on the form
+                        this.studentsInfo.Add(newStudent);
+                        // Exercise 2: Task 4c: Enable saving (changes are not made permanent until they are written back to the database)
+                        saveChanges.IsEnabled = true;
+                    }
+
                     break;
             }
         }
