@@ -104,6 +104,26 @@ namespace School
                     }
 
                     break;
+
+                // If the user pressed Delete, remove the currently selected student
+                case Key.Delete:
+                    student = this.studentsList.SelectedItem as Student;
+                    // Prompt the user to confirm that the student should be removed
+                    MessageBoxResult response = MessageBox.Show(
+                        string.Format("Remove {0}", student.FirstName + " " + student.LastName),
+                        "Confirm",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question,
+                        MessageBoxResult.No);
+                    // If the user clicked Yes, remove the student from the database
+                    if (response == MessageBoxResult.Yes)
+                    {
+                        this.schoolContext.Students.DeleteObject(student);
+                        // Enable saving (changes are not made permanent until they are written back to the database)
+                        saveChanges.IsEnabled = true;
+                    }
+
+                    break;
             }
         }
 
