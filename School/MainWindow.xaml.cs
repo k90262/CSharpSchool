@@ -149,7 +149,24 @@ namespace School
         public object Convert(object value, Type targetType, object parameter,
                               System.Globalization.CultureInfo culture)
         {
-            return "";
+            //return value;
+            // Convert the date of birth provided in the value parameter and convert to the age of the student in years
+            // Check that the value provided is not null. If it is, return an empty string
+            if (value != null)
+            {
+                // Convert the value provided into a DateTime value
+                DateTime studentDateOfBirth = (DateTime)value;
+                // Work out the difference between the current date and the value provided
+                TimeSpan difference = DateTime.Now.Subtract(studentDateOfBirth);
+                // Convert this result into a number of years
+                int ageInYears = (int)(difference.Days / 365.25);
+                // Convert the number of years into a string and return it
+                return ageInYears.ToString();
+            }
+            else
+            {
+                return "";
+            }
         }
 
         #region Predefined code
