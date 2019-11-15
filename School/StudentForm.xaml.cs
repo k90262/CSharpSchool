@@ -23,15 +23,17 @@ namespace School
             // Check that the user has provided a first name
             if (String.IsNullOrEmpty(this.firstName.Text))
             {
-                MessageBox.Show("The student must has a first name", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("The student must have a first name", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+
             // Check that the user has provided a last name
             if (String.IsNullOrEmpty(this.lastName.Text))
             {
-                MessageBox.Show("The student must has a last name", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("The student must have a last name", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+
             // Check that the user has entered a valid date for the date of birth
             DateTime result;
             if (!DateTime.TryParse(this.dateOfBirth.Text, out result))
@@ -39,6 +41,7 @@ namespace School
                 MessageBox.Show("The date of birth must be a valid date", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+
             // Verify that the student is at least 5 years old
             TimeSpan age = DateTime.Now.Subtract(result);
             if (age.Days / 365.25 < 5)
