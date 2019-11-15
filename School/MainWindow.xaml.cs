@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using School.Data;
-using System.Globalization;
+
 
 namespace School
 {
@@ -60,116 +60,106 @@ namespace School
             switch (e.Key)
             {
                 // If the user pressed Enter, edit the details for the currently selected student
-                case Key.Enter:
-                    // Copy code for editing the details for that student
-                    Student student = this.studentsList.SelectedItem as Student;
-                    EditStudent(student);
-
+                case Key.Enter: Student student = this.studentsList.SelectedItem as Student;
+                    editStudent(student);
                     break;
 
                 // If the user pressed Insert, add a new student
-                case Key.Insert:
-
-                    StudentForm sf = AddNewStudent();
-
+                case Key.Insert: addnewStudent();
                     break;
 
                 // If the user pressed Delete, remove the currently selected student
-                case Key.Delete:
-                    student = this.studentsList.SelectedItem as Student;
-                    RemoveStudent(student);
-
+                case Key.Delete: student = this.studentsList.SelectedItem as Student;
+                    removeStudent(student);
                     break;
             }
         }
 
-        private void RemoveStudent(Student student)
+        // If the user double-clicks a student, edit the details for that student
+        private void studentsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            editStudent(this.studentsList.SelectedItem as Student);
+        }
 
-            // Refactor as the removeStudent method
-
+        // Remove the details of a student
+        private void removeStudent(Student student)
+        {
             // Prompt the user to confirm that the student should be removed
             MessageBoxResult response = MessageBox.Show(
-                string.Format("Remove {0}", student.FirstName + " " + student.LastName),
-                "Confirm",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
+                String.Format("Remove {0}", student.FirstName + " " + student.LastName),
+                "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question,
                 MessageBoxResult.No);
+
             // If the user clicked Yes, remove the student from the database
             if (response == MessageBoxResult.Yes)
             {
                 this.schoolContext.Students.DeleteObject(student);
+
                 // Enable saving (changes are not made permanent until they are written back to the database)
                 saveChanges.IsEnabled = true;
             }
         }
 
-        private StudentForm AddNewStudent()
+        // Add a new student. 
+        private void addnewStudent()
         {
-            // Refactor as the addNewStudent method
-
             // Use the StudentsForm to get the details of the student from the user
             StudentForm sf = new StudentForm();
+
             // Set the title of the form to indicate which class the student will be added to (the class for the currently selected teacher)
             sf.Title = "New Student for Class " + teacher.Class;
+
             // Display the form and get the details of the new student
             if (sf.ShowDialog().Value)
             {
-                // When the user closes the form, retrieve the details of the student from the form and use them to create a new Student object
+                // When the user closes the form, retrieve the details of the student from the form
+                // and use them to create a new Student object
                 Student newStudent = new Student();
                 newStudent.FirstName = sf.firstName.Text;
                 newStudent.LastName = sf.lastName.Text;
-                newStudent.DateOfBirth = DateTime.ParseExact(sf.dateOfBirth.Text, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                newStudent.DateOfBirth = DateTime.Parse(sf.dateOfBirth.Text);
+
                 // Assign the new student to the current teacher
                 this.teacher.Students.Add(newStudent);
+
                 // Add the student to the list displayed on the form
                 this.studentsInfo.Add(newStudent);
+
                 // Enable saving (changes are not made permanent until they are written back to the database)
                 saveChanges.IsEnabled = true;
             }
-
-            return sf;
         }
 
-        // create Edit student method
-        private void EditStudent(Student student)
+        // Edit the details of a student
+        private void editStudent(Student student)
         {
-
-            // Refactor as the EditStudent method
-
             // Use the StudentsForm to display and edit the details of the student
             StudentForm sf = new StudentForm();
-            // Set the title of the form and populate the fields on the form with the details of the student
+
+            // Set the title of the form and populate the fields on the form with the details of the student           
             sf.Title = "Edit Student Details";
             sf.firstName.Text = student.FirstName;
             sf.lastName.Text = student.LastName;
-            sf.dateOfBirth.Text = student.DateOfBirth.ToString("MM/dd/yyyy");
+            sf.dateOfBirth.Text = student.DateOfBirth.ToString("d"); // Format the date to omit the time element
+
             // Display the form
             if (sf.ShowDialog().Value)
             {
                 // When the user closes the form, copy the details back to the student
                 student.FirstName = sf.firstName.Text;
                 student.LastName = sf.lastName.Text;
-                student.DateOfBirth = DateTime.ParseExact(sf.dateOfBirth.Text, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                student.DateOfBirth = DateTime.Parse(sf.dateOfBirth.Text);
+
                 // Enable saving (changes are not made permanent until they are written back to the database)
                 saveChanges.IsEnabled = true;
             }
-        }
-        #region Predefined code
-        // If the user double-clicks a student, edit the details for that student
-        private void studentsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            Student student = this.studentsList.SelectedItem as Student;
-            EditStudent(student);
         }
 
         // Save changes back to the database and make them permanent
         private void saveChanges_Click(object sender, RoutedEventArgs e)
         {
-
+           
         }
-
-        #endregion
     }
 
     [ValueConversion(typeof(string), typeof(Decimal))]
@@ -178,18 +168,12 @@ namespace School
         public object Convert(object value, Type targetType, object parameter,
                               System.Globalization.CultureInfo culture)
         {
-            //return value;
             // Convert the date of birth provided in the value parameter and convert to the age of the student in years
-            // Check that the value provided is not null. If it is, return an empty string
             if (value != null)
             {
-                // Convert the value provided into a DateTime value
                 DateTime studentDateOfBirth = (DateTime)value;
-                // Work out the difference between the current date and the value provided
                 TimeSpan difference = DateTime.Now.Subtract(studentDateOfBirth);
-                // Convert this result into a number of years
                 int ageInYears = (int)(difference.Days / 365.25);
-                // Convert the number of years into a string and return it
                 return ageInYears.ToString();
             }
             else
